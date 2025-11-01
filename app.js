@@ -19,25 +19,36 @@ document.addEventListener('DOMContentLoaded', () => {
             // 检查大图 - 这是你实现“大图加价”的逻辑点
             if (file.size > 5 * 1024 * 1024) { // 举例：大于5MB
                 alert('这是一张大图 (大于5MB)，请购买“大图加价”服务后使用。');
-                // 你可以在这里停止处理，或者标记为“大图”
-                // 为简化，我们这里先不清空
-                // imageInput.value = null; 
-                // return;
             }
 
             const reader = new FileReader();
+            
+            // 当 FileReader 读取文件完成时
             reader.onload = (e) => {
-                originalImage.src = e.target.result; // 将图片加载到隐藏的img标签
-                uploadedImage = originalImage;
                 
-                uploadLabel.textContent = `已上传: ${file.name}`;
-                generateButton.textContent = '点击生成像素图';
-                generateButton.classList.remove('disabled');
-                generateButton.disabled = false;
+                // --- 这是关键的修复 ---
+                // 我们必须等待 <img> 标签也“加载”完这张图片
+                originalImage.onload = () => {
+                    // 1. 标记图片已准备好
+                    uploadedImage = originalImage;
+                    
+                    // 2. 更新按钮文字和状态
+                    uploadLabel.textContent = `已上传: ${file.name}`;
+                    generateButton.textContent = '点击生成像素图';
+                    generateButton.classList.remove('disabled');
+                    generateButton.disabled = false;
+                    
+                    // 3. 重置下载链接和画布
+                    downloadLink.classList.add('disabled'); 
+                    canvasContainer.style.display = 'none';
+                };
                 
-                downloadLink.classList.add('disabled'); // 重置下载按钮
-                canvasContainer.style.display = 'none'; // 隐藏旧画布
+                // 把图片数据交给 <img> 标签去加载
+                originalImage.src = e.target.result; 
+                // --- 修复结束 ---
             };
+            
+            // 开始读取文件
             reader.readAsDataURL(file);
         }
     });
@@ -45,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. 监听“生成”按钮点击
     generateButton.addEventListener('click', () => {
         if (!uploadedImage) {
-            alert('请先上传一张图片');
+            alert('图片尚未准备好，请稍等或重新上传。');
             return;
         }
 
@@ -57,14 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // 调用像素化方法
-        // 你可以调整这里的参数来改变效果
         px.pixelate({
-            // 'blocksize' 决定像素块的大小，数值越大，马赛克越明显
-            // 建议范围 5 - 15
             blockSize: 8, 
-            
-            // 这里可以设置一个调色板（可选）
-            // palette: [ [R,G,B], [R,G,B], ... ]
         })
         .draw() // 执行绘制
         .save(); // 保存到canvas
