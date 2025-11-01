@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>像素图生成器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Chen的像素图工坊 🎨</h1>
+        <p>上传一张图片，即刻生成专属像素风格</p>
+
+        <div class="upload-box">
+            <input type="file" id="imageInput" accept="image/*">
+            <label for="imageInput" class="upload-label">点击上传图片</label>
+        </div>
+
+        <div class="canvas-container">
+            <img id="originalImage" alt="Original Image" style="display:none;">
+            <canvas id="pixelCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <div class="actions">
+            <button id="generateButton" class="disabled" disabled>请先上传图片</button>
+            <a id="downloadLink" class="button disabled" href="#" download="pixel-art.png">下载像素图</a>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/pixelit@1.2.1/pixelit.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
