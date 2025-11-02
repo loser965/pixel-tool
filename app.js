@@ -50,15 +50,20 @@ window.addEventListener('load', () => {
         }
 
         // --- 核心像素化逻辑 ---
+        
+        // 【最终修复】
+        // 我们必须设置 "draw: false"，
+        // 否则 pixelit 工具库会“自作聪明”地自动运行 .draw().save()，
+        // 这会和我们后面的 .pixelate() 命令“打架”。
         const px = new pixelit({
             from: uploadedImage, 
-            to: pixelCanvas      
+            to: pixelCanvas,
+            draw: false // <--- 这就是我们两天来一直在找的那个 Bug
         });
 
-        // 【最终修复】
         // 正确的顺序是：
-        // 1. .draw() 先加载数据（会短暂显示原图）
-        // 2. .pixelate() 再进行像素化（会覆盖掉原图）
+        // 1. .draw() 先加载数据
+        // 2. .pixelate() 再进行像素化
         // 3. .save() 最后保存
         px.draw()
           .pixelate({
