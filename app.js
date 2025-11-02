@@ -1,5 +1,8 @@
-// 等待文档加载完毕
-document.addEventListener('DOMContentLoaded', () => {
+// 【修复】
+// 不再使用 "DOMContentLoaded"，因为它不等脚本加载
+// 我们使用 "load" 事件，它会等待所有资源（包括 pixelit.js）
+// 全部加载完成后，才执行内部代码。
+window.addEventListener('load', () => {
 
     // 获取所有需要的元素
     const imageInput = document.getElementById('imageInput');
@@ -16,39 +19,27 @@ document.addEventListener('DOMContentLoaded', () => {
     imageInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
-            // 检查大图 - 这是你实现“大图加价”的逻辑点
-            if (file.size > 5 * 1024 * 1024) { // 举例：大于5MB
+            if (file.size > 5 * 1024 * 1024) { 
                 alert('这是一张大图 (大于5MB)，请购买“大图加价”服务后使用。');
             }
 
             const reader = new FileReader();
             
-            // 当 FileReader 读取文件完成时
             reader.onload = (e) => {
-                
-                // --- 这是关键的修复 ---
-                // 我们必须等待 <img> 标签也“加载”完这张图片
                 originalImage.onload = () => {
-                    // 1. 标记图片已准备好
                     uploadedImage = originalImage;
                     
-                    // 2. 更新按钮文字和状态
                     uploadLabel.textContent = `已上传: ${file.name}`;
                     generateButton.textContent = '点击生成像素图';
                     generateButton.classList.remove('disabled');
                     generateButton.disabled = false;
                     
-                    // 3. 重置下载链接和画布
                     downloadLink.classList.add('disabled'); 
                     canvasContainer.style.display = 'none';
                 };
-                
-                // 把图片数据交给 <img> 标签去加载
                 originalImage.src = e.target.result; 
-                // --- 修复结束 ---
             };
             
-            // 开始读取文件
             reader.readAsDataURL(file);
         }
     });
@@ -61,27 +52,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- 核心像素化逻辑 ---
-        // 初始化 pixelit 对象
+        // 现在，当这段代码运行时，"pixelit" 肯定是已经加载好的
         const px = new pixelit({
-            from: uploadedImage, // 来源是我们的img标签
-            to: pixelCanvas      // 目标是我们的canvas标签
+            from: uploadedImage, 
+            to: pixelCanvas      
         });
 
         // 调用像素化方法
         px.pixelate({
             blockSize: 8, 
         })
-        .draw() // 执行绘制
-        .save(); // 保存到canvas
+        .draw() 
+        .save(); 
 
         // --- 逻辑结束 ---
 
         // 3. 显示结果和下载按钮
-        canvasContainer.style.display = 'block'; // 显示画布容器
+        canvasContainer.style.display = 'block'; 
         
-        // 更新下载链接
-        downloadLink.href = pixelCanvas.toDataURL('image/png'); // 从canvas获取图片数据
+        downloadLink.href = pixelCanvas.toDataURL('image/png'); 
         downloadLink.classList.remove('disabled');
     });
 
-});
+}); // 【修复】对应开头的 window.addEventListener
