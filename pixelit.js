@@ -247,7 +247,7 @@ class pixelit {
         var y = (i * res + (i * res + res)) / 2;
         var p = (Math.floor(y) * width + Math.floor(x)) * 4;
         //if alpha is 0, skip pixel
-        if (data[p + 3] == 0) {
+        if (alpha == 0) {
           continue;
         }
         var color = [data[p], data[p + 1], data[p + 2]];
