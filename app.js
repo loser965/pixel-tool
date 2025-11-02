@@ -56,13 +56,15 @@ window.addEventListener('load', () => {
         });
 
         // 【最终修复】
-        // 我们删除了 .draw()
-        // .pixelate() 负责画像素图
-        // .save() 负责生成下载链接
-        px.pixelate({
+        // 正确的顺序是：
+        // 1. .draw() 先加载数据（会短暂显示原图）
+        // 2. .pixelate() 再进行像素化（会覆盖掉原图）
+        // 3. .save() 最后保存
+        px.draw()
+          .pixelate({
             blockSize: 8, 
-        })
-        .save(); // <-- .draw() 已被删除
+          })
+          .save();
 
         // --- 逻辑结束 ---
 
