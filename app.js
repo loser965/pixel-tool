@@ -1,6 +1,4 @@
-// 【修复】
-// 不再使用 "DOMContentLoaded"，因为它不等脚本加载
-// 我们使用 "load" 事件，它会等待所有资源（包括 pixelit.js）
+// 使用 "load" 事件，它会等待所有资源（包括 pixelit.js）
 // 全部加载完成后，才执行内部代码。
 window.addEventListener('load', () => {
 
@@ -52,18 +50,19 @@ window.addEventListener('load', () => {
         }
 
         // --- 核心像素化逻辑 ---
-        // 现在，当这段代码运行时，"pixelit" 肯定是已经加载好的
         const px = new pixelit({
             from: uploadedImage, 
             to: pixelCanvas      
         });
 
-        // 调用像素化方法
+        // 【最终修复】
+        // 我们删除了 .draw()
+        // .pixelate() 负责画像素图
+        // .save() 负责生成下载链接
         px.pixelate({
             blockSize: 8, 
         })
-        .draw() 
-        .save(); 
+        .save(); // <-- .draw() 已被删除
 
         // --- 逻辑结束 ---
 
@@ -74,4 +73,4 @@ window.addEventListener('load', () => {
         downloadLink.classList.remove('disabled');
     });
 
-}); // 【修复】对应开头的 window.addEventListener
+});
